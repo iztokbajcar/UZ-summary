@@ -1,6 +1,9 @@
 \documentclass{article}
-\usepackage{amsmath}
 
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\author{ib8548}
 \title{
     UZ summary \\
     \large Summary of the Machine Perception course lectures at FRI
@@ -141,12 +144,122 @@ Processing steps:
             When chaining \textbf{linear} filters, the order \textbf{doesn't matter}.
             When chaining \textbf{nonlinear} filters (e.g.\ the median filter), the order \textbf{does matter}.
 
-        \subsection{Linear filtering as template atching}
+        \subsection{Linear filtering as template matching}
         \begin{itemize}
             \item If we correlate the image with a template, we get a map of the template's similarity to the image
             \item The max value of the map is the location of the template in the image
             \item To account for the scale dissimilarities, we can start with the original version of our image, correlate with the template, scale the image \textbf{down} (subsample) and repeat the process --- \textbf{image pyramid}
             \item \textbf{Smoothing} the image before subsampling removes the features that couldn't be reconstructed in the subsampled image because of \textbf{antialiasing}
         \end{itemize}
+    
+        \newpage
+\section{Derivatives and edge detection}
+
+    \subsection{Image derivatives}
+
+    Implementation by convolution:
+    \begin{itemize}
+        \item \textbf{Horizontal derivative:} 
+        \begin{itemize}
+            \item $ \frac{\partial{f}(x, y)}{\partial{x}} \approx \frac{f(x+1, y) - f(x, y)}{1}$
+            \item kernel:
+            $\begin{bmatrix}
+                -1 & 1
+            \end{bmatrix}$
+        \end{itemize}
+
+        \item \textbf{Vertical derivative:} 
+        \begin{itemize}
+            \item $ \frac{\partial{f}(x, y)}{\partial{y}} \approx \frac{f(x, y+1) - f(x, y)}{1}$
+            \item kernel:
+            $\begin{bmatrix}
+                -1 \\
+                 1
+            \end{bmatrix}$
+        \end{itemize}
+
+        \item \textbf{Image gradient:}
+        \begin{itemize}
+            \item $\nabla{f} = 
+            \begin{bmatrix}
+                \frac{\partial{f}}{\partial{x}}, \frac{\partial{f}}{\partial{y}}
+            \end{bmatrix}$
+            \item It points in the direction of greatest intensity change
+            \item Gradient direction: $\theta = \arctan{(\frac{\partial{f}}{\partial{y}} / \frac{\partial{f}}{\partial{x}})}$
+            \item Gradient strength (magnitude): $\sqrt{(\frac{\partial{f}}{\partial{x}})^2 + (\frac{\partial{f}}{\partial{y}})^2}$
+        \end{itemize}
+    \end{itemize}
+
+    Because derivation amplifies the noise in the image, we usually smooth the image using a \textbf{2D Gaussian filter}:
+    \begin{itemize}
+        \item $I \rightarrow I * (\frac{\partial{G}}{\partial{x}})$
+        \item The kernel size determines which structures are preserved: \textbf{bigger} Gaussian kernels detect edges on a \textbf{bigger} scale.
+    \end{itemize}
+
+    \subsection{Edge detection}
+    The basic idea: find \textbf{strong gradients}, then post-process \\
+    Criteria for an \textbf{optimal edge detector}:
+    \begin{itemize}
+        \item \textbf{Good detection:} minimizing the probability of false positives and false negatives
+        \item \textbf{Good localization:} detecting edges close to their true location
+        \item \textbf{Specificity:} minimizing the number of local maxima around the true edge (returning a single point per true edge)
+    \end{itemize}
+
+        \subsubsection{Canny edge detector}
+        \begin{enumerate}
+            \item Filter image by a \textbf{derivative of a Gaussian}
+            \item Calculate the gradient \textbf{magnitude} and \textbf{orientation}
+            \item \textbf{Thin} potential edges to a single pixel thickness \\
+            \textbf{Non-maxima suppression} --- for each pixel, check if it is a local maximum along its gradient direction. If it is not, set it to zero in the modified image.
+            \item Select sequences of connected pixels that are likely an edge \\
+            \textbf{Hysteresis} --- choose two thresholds, $t_{low}$ and $t_{high}$. Discard all pixels below $t_{low}$ and retain pixels that are above $t_{high}$ or connected into a component that contains at least one pixel above $t_{high}$.
+        \end{enumerate}
+
+        \noindent
+        
+    \subsection{Edge detection by parametric models}
+
+        \subsubsection{Hough Transform}
+        \begin{enumerate}
+            \item For each edge point compute parameters of all possible lines passing through that point
+            \[
+                x \cos{\vartheta} + y \sin{\vartheta} = \rho
+            \]
+            \item Cast a vote for each set of parameters (e.g.\ store votes inside an accumulator array)
+            \item Select the lines that recieve enough votes (i.e.\ elements of the accumulator array with the highest/high enough values)
+        \end{enumerate}
+        Extensions:
+        \begin{itemize}
+            \item Use the gradient direction \\
+                  $\vartheta$ = gradient direction at $(x, y)$
+            \item Assign higher weight (in votes) to points with large edge magnitude
+                  (instead $H[\rho, \vartheta] \text{ += } 1$ use $H[\rho, \vartheta] \text{ += } m(x, y)$)
+        \end{itemize}
+        
+        \fbox{\parbox{\textwidth}{
+
+            \noindent Pros:
+            \begin{itemize}
+                \item Each point is processed independently:
+                \begin{itemize}
+                    \item Robustness to partial occlusion
+                    \item Highly parallelizable
+                \end{itemize}
+                \item Robustness to noise
+                \item Can detect multiple instances of a single model in one pass
+            \end{itemize}
+
+            \noindent Cons:
+            \begin{itemize}
+                \item Time complexity increases exponentially with the number of free \\ parameters
+            \end{itemize}
+
+        }}
+
+    \newpage
+
+\section{Fitting parametric models}
+\[ \mathbf{x}_i' = f(\mathbf{x}_i ; \mathbf{p}) \]
+\[ \mathbf{x}_i' = \mathbf{R} \mathbf{x}_i + \mathbf{T} \]
         
 \end{document}

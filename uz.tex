@@ -1,0 +1,74 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{
+    UZ summary \\
+    \large Summary of the Machine Perception course lectures at FRI
+}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Image processing}
+
+Processing steps:
+\begin{enumerate}
+    \item Convert gray image to binary image \textbf{(thresholding)}
+    \item Clean binary image \textbf{(morphologic filtering)}
+    \item Extract individual regions \textbf{(connected components)}
+\end{enumerate}
+
+    \subsection{Thresholding}
+    Otsu's algorithm:
+    \begin{enumerate}
+        \item Separate the pixels into two groups by intensity threshold $T$
+        \item For each group get an average intensity and calculate $\sigma^{2}_{between}$
+        \item Select the $T$ that maximizes the variance: \\
+                  $T^* = argmax_T[ \sigma^{2}_{between}(T) ]$
+    \end{enumerate}
+
+    \subsection{Cleaning the image}
+    
+        \subsubsection{Fitting and hitting}
+        \textbf{Fitting:} all ``1'' pixels in the SE (structuring element) cover all ``1'' pixels in the image \\ 
+        \textbf{Hitting:} at least one ``1'' pixels in the SE covers a ``1'' pixel in the image
+
+        \subsubsection{Erosion}
+        \begin{itemize}
+            \item Reduces the size of structures
+            \item Removes bridges, branches, noise
+            \item $g(x, y) = 
+            \begin{cases}
+                1 \text{ if } s \text{ fits } f \\
+                0 \text{ otherwise }
+            \end{cases}$
+        \end{itemize}
+
+        \subsubsection{Dilation}
+        \begin{itemize}
+            \item Increases the size of structures
+            \item Fills holes in regions
+            \item $g(x, y) =
+            \begin{cases}
+                1 \text{ if } s \text{ hits } f \\
+                0 \text{ otherwise }
+            \end{cases}$
+        \end{itemize}
+
+        \subsubsection{Opening}
+        \begin{itemize}
+            \item \textbf{Erosion} followed by \textbf{dilation}
+            \item Removes small objects, preserves rough shape
+            \item Filters out structures depending on the size and shape of the structuring element
+        \end{itemize}
+
+        \subsubsection{Closing}
+        \begin{itemize}
+            \item \textbf{Dilation} followed by \textbf{erosion}
+            \item Fills holes, preserves rough shape
+        \end{itemize}
+
+\end{document}

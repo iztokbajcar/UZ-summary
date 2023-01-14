@@ -71,4 +71,82 @@ Processing steps:
             \item Fills holes, preserves rough shape
         \end{itemize}
 
+    \subsection{Labelling regions}
+
+        \subsubsection{Sequential connected components}
+        \begin{itemize}
+            \item Process image from left to right, from top to bottom:
+            \begin{enumerate}
+                \item If the current pixel value is 1
+                \begin{enumerate}
+                    \item If only one neighbor \textbf{(left or top)} is 1, copy its label
+                    \item If both neighbors are 1 and have the same label, copy the label
+                    \item If they have different labels:
+                    \begin{itemize}
+                        \item Copy label from the left
+                        \item Update the table of equivalent labels (remember that the label of the left neighbor represents the same connected component as the label of the top neighbor)
+                    \end{itemize}
+                    \item Otherwise form a new label
+                \end{enumerate}
+            \end{enumerate}
+            \item Relabel with the smallest equivalent labels
+        \end{itemize}
+
+    \subsection{Color}
+
+    \begin{itemize}
+        \item Additive models
+        \item Subtractive models
+    \end{itemize}
+
+        \subsubsection{Color spaces}
+        \begin{itemize}
+            \item Role: unique color specification
+            \item A color space is defined by the choice of primary colors (primaries)
+        \end{itemize}
+                \subsubsection{Non-uniform color spaces}
+                \begin{itemize}
+                    \item If two colors are close to each other (by Euclidean distance), it \textbf{doesn't mean that they are similar perceptually}
+                    \item CIE XYZ --- linear
+                    \item RGB --- linear
+                    \item HSV --- nonlinear
+                \end{itemize}
+
+                \subsubsection{Uniform color spaces}
+                \begin{itemize}
+                    \item CIE Lab
+                    \item CIE u'v'
+                \end{itemize}
+
+        \subsection{Color description by using histograms}
+        \begin{itemize}
+            \item Histograms record the frequency of intensity levels \\
+                  $h(i) = \text{ the number of pixels in } I \text{ with the intensity value } i$
+            \item Color histogram is a robust representation of images (robust to changes in translation, scale and partial occlusion)
+        \end{itemize}
+
+        \subsection{Filtering}
+        \begin{itemize}
+            \item Noise reduction and image restoration
+            \item Structure extraction/enhancement
+        \end{itemize}
+
+            \subsubsection{Types of noise}
+            \begin{itemize}
+                \item Gaussian noise
+                \item Salt and pepper noise
+                \item Impulse noise
+            \end{itemize}
+
+            When chaining \textbf{linear} filters, the order \textbf{doesn't matter}.
+            When chaining \textbf{nonlinear} filters (e.g.\ the median filter), the order \textbf{does matter}.
+
+        \subsection{Linear filtering as template atching}
+        \begin{itemize}
+            \item If we correlate the image with a template, we get a map of the template's similarity to the image
+            \item The max value of the map is the location of the template in the image
+            \item To account for the scale dissimilarities, we can start with the original version of our image, correlate with the template, scale the image \textbf{down} (subsample) and repeat the process --- \textbf{image pyramid}
+            \item \textbf{Smoothing} the image before subsampling removes the features that couldn't be reconstructed in the subsampled image because of \textbf{antialiasing}
+        \end{itemize}
+        
 \end{document}

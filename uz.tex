@@ -37,7 +37,7 @@ Processing steps:
     
         \subsubsection{Fitting and hitting}
         \textbf{Fitting:} all ``1'' pixels in the SE (structuring element) cover all ``1'' pixels in the image \\ 
-        \textbf{Hitting:} at least one ``1'' pixels in the SE covers a ``1'' pixel in the image
+        \textbf{Hitting:} at least one ``1'' pixel in the SE covers a ``1'' pixel in the image
 
         \subsubsection{Erosion}
         \begin{itemize}
@@ -233,7 +233,7 @@ Processing steps:
             \item Use the gradient direction \\
                   $\vartheta$ = gradient direction at $(x, y)$
             \item Assign higher weight (in votes) to points with large edge magnitude
-                  (instead $H[\rho, \vartheta] \text{ += } 1$ use $H[\rho, \vartheta] \text{ += } m(x, y)$)
+                  (instead of $H[\rho, \vartheta] \text{ += } 1$ use $H[\rho, \vartheta] \text{ += } m(x, y)$)
         \end{itemize}
         
         \fbox{\parbox{\textwidth}{
@@ -261,5 +261,45 @@ Processing steps:
 \section{Fitting parametric models}
 \[ \mathbf{x}_i' = f(\mathbf{x}_i ; \mathbf{p}) \]
 \[ \mathbf{x}_i' = \mathbf{R} \mathbf{x}_i + \mathbf{T} \]
+
+\begin{itemize}
+    \item Example: transform $\mathbf{x}_i$ into $\mathbf{x'}_i$ by a function $f(\mathbf{x;p})$
+    \item Inverse problem: \textbf{find the transformation parameters} based on a set of correspondences --- best values for $\mathbf{p}$
+    \item Best parameter values: those that \textbf{minimize} the \textbf{projection error}
+\end{itemize}
+
+\textbf{TODO} least squares
+
+    \subsection{RANSAC}
+    (\textbf{Ran}dom \textbf{Sa}mple \textbf{C}onsensus)
+    \begin{enumerate}
+        \item Randomly select the smallest group of correspondences from which we can estimate the parameters
+        \item Fit the parametric model to the selected correspondences (e.g.\ by the least squares method)
+        \item Project all other points and count the number of inliers
+        \item Remember the parameters that maximize the number of inliers
+    \end{enumerate}
+
+    \noindent Parameters:
+    \begin{itemize}
+        \item \textbf{Threshold} for identifying the inliers (chosen in a way that we achieve the desired probability of an inlier falling below the threshold)
+        \item The number of \textbf{sampling iterations}
+    \end{itemize}
+    We typically need as many correspondences as there are parameters for our model. \\
+
+    \fbox{\parbox{\textwidth}{
+        \noindent Pros:
+        \begin{itemize}
+            \item Very simple and general
+            \item Applicable to many real-life problems
+            \item Often used in practice
+        \end{itemize}
+
+        \noindent Cons:
+        \begin{itemize}
+            \item We need to decide on the parameters
+            \item Finding the optimum may require many iterations
+            \item Fails at a very small number of inliers
+        \end{itemize}
+    }}
         
 \end{document}

@@ -301,5 +301,119 @@ Processing steps:
             \item Fails at a very small number of inliers
         \end{itemize}
     }}
+
+    \newpage
+
+\section{Keypoints and matching}
+\begin{enumerate}
+    \item Keypoint \textbf{DETECTION}
+    \item Keypoint \textbf{DESCRIPTION}
+    \item Keypoint \textbf{MATCHING}
+\end{enumerate}
+
+    \subsection{Single scale keypoint detection}
+    \begin{itemize}
+        \item Harris corner detector
+        \item Hessian corner detector
+    \end{itemize}
+
+    Both are rotation invariant, but \textbf{not invariant to scale change}.
+    
+    \subsubsection{Harris corner detector}
+    \[
+        M = \begin{bmatrix}
+            \sum_{x, y}{w(x, y) I_x(x, y) I_x(x, y)} & \sum_{x, y}{w(x, y) I_x(x, y) I_y(x, y)} \\
+            \sum_{x, y}{w(x, y) I_x(x, y) I_y(x, y)} & \sum_{x, y}{w(x, y) I_y(x, y) I_y(x, y)}
+        \end{bmatrix}
+        \]
+        \[
+            \Downarrow
+            \]
+            \[
+                M = \begin{bmatrix}
+                    G(\sigma) * I^{2}_{x} & G(\sigma) * I_x I_y \\
+                    G(\sigma) * I_x I_y & G(\sigma) * I^{2}_y
+                \end{bmatrix}
+        \]
+
+        \subsubsection{Hessian corner detector}
+        \begin{itemize}
+            \item Determinant of a Hessian
+            
+            \[
+                \text{Hessian($I$)} = \begin{bmatrix}  % chktex 36
+                    I_{xx} & I_{xy} \\
+                    I_{xy} & I_{yy}
+                \end{bmatrix}
+            \]
+            \[
+                \text{det(Hessian($I$))}  % chktex 36
+            \]
+        \end{itemize}
+    
+    \subsection{Scale selection}
+    \begin{itemize}
+        \item Blob detection
+    \end{itemize}
+
+        \subsubsection{Laplacian of Gaussian (LoG)}
+        \[
+            \nabla^2 g = \frac{\partial^2 g}{\partial{x}^2} + \frac{\partial^2 g}{\partial{y}^2}
+        \]
         
+        \[
+            L = \sigma^2 (G_{xx}(x, y, \sigma) + G_{yy}(x, y, \sigma))
+        \]
+
+        \begin{itemize}
+            \item Laplacian pyramid
+            \item LoG can be well approximated with a difference of Gaussians
+
+        \end{itemize}
+        
+        \subsubsection{Difference of Gaussians (DoG)}
+        \[
+            DoG = G(x, y, k \sigma) - G(x, y, \sigma)
+        \]
+        
+        \begin{itemize}
+            \item this does not require computation of second derivatives
+        \end{itemize}
+
+    \subsection{Local descriptors}
+    \begin{itemize}
+        \item How to describe keypoints?
+    \end{itemize}
+
+    \subsubsection{Scale Invariant Feature Transform (SIFT)}
+    \begin{enumerate}
+        \item Split region into 4$\times$4 sub-regions: 16 cells
+        \item Calculate \textbf{gradients} on each pixel and \textbf{smooth} over a few neighbours
+        \item In each cell calculate a \textbf{histogram} of gradient orientations (8 directions)
+        \item Descriptor (stack histograms into a vector and normalize): 4$\times$4$\times$8 = 128 dimensions
+    \end{enumerate}
+
+    SIFT \textbf{is not} rotation invariant, but it is fast and very robust to intensity changes.
+
+    \subsubsection{Finding correspondences using keypoints}
+    Strategies:
+    \begin{enumerate}
+        \item For each keypoint in the left image identify the most similar keypoint in the right image
+        \item Keep only symmetric matches
+        \begin{itemize}
+            \item i.e.\ keep only correspondences between every two points A and B, where A is a point in the left image and B is its match in the right image, so that B is most similar to A among all points in the right image and vice versa.
+        \end{itemize}
+        \item Calculate the distances between:
+        \begin{itemize}
+            \item point $A$ and the \textbf{second most similar} keypoint in the right image
+            \item point $A$ and the \textbf{most similar} keypoint in the right image 
+        \end{itemize}
+        and then calculate their ratio
+        \begin{itemize}
+            \item it will be \textbf{low for distinctive} keypoints and \textbf{high for distinctive} keypoints
+        \end{itemize}
+    \end{enumerate}
+
+    \newpage
+
 \end{document}

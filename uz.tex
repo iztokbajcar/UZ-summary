@@ -282,6 +282,12 @@ Processing steps:
     \noindent Parameters:
     \begin{itemize}
         \item \textbf{Threshold} for identifying the inliers (chosen in a way that we achieve the desired probability of an inlier falling below the threshold)
+
+            \begin{align*}
+                p_{fail} &= {(1 - w^{n})}^k \\
+                k &= \frac{\log{(p_{fail})}}{\log{(1 - w^n)}} 
+            \end{align*}
+
         \item The number of \textbf{sampling iterations}
     \end{itemize}
     We typically need as many correspondences as there are parameters for our model. \\
@@ -415,5 +421,82 @@ Processing steps:
     \end{enumerate}
 
     \newpage
+
+\section{Camera geometry}
+Two kinds of projections
+\begin{enumerate}
+    \item \textbf{Extrinsic} projection: 3D World $\rightarrow$ 3D Camera
+    \item \textbf{Intrinsic} projection: 3D Camera $\rightarrow$ 2D Image
+\end{enumerate}
+
+    \subsection{Calibration matrix}
+    Prescribes the projection of a 3D point in camera coordinate system into pixels.
+
+    \[
+        \mathbf{K} = \begin{bmatrix}
+            \alpha_x & s & x_0 \\
+            0 & \alpha_y & y_0 \\
+            0 & 0 & 1
+        \end{bmatrix}
+    \]
+
+    \noindent $\mathbf{\alpha_x}$, $\mathbf{\alpha_y}$ --- scale \\
+    $\mathbf{x_0}$, $\mathbf{y_0}$ --- translation \\
+    $\mathbf{s}$ --- skewing factor \\
+
+    \noindent World-to-camera coordinate system transformation:
+    \[
+        \tilde{X}_{cam} = R(\tilde{X} - \tilde{C})
+    \]
+
+    \noindent $\mathbf{R}$ --- the camera's rotation matrix \\
+    $\mathbf{\tilde{C}}$ --- camera origin in world c.\ s. \\
+    $\mathbf{\tilde{X}}$ --- a 3D point in the world c.\ s. \\
+    $\mathbf{\tilde{X}_{cam}}$ --- the same point, represented in the camera c.\ s. \\
+
+    \subsection{Camera parameters}
+        \subsubsection{Intrinsic}
+        \begin{center}
+            \begin{tabular}{l c}
+                Parameter & Degrees of freedom \\
+                \hline  % chktex 44
+                Principal point coordinates & 2 \\
+                Focal length & 1 \\
+                Pixel scaling factor (rectangular pixels) & 1 \\
+                Shear (non-rectangular sensor array) & 1 \\
+                Radial distortion
+            \end{tabular}
+        \end{center}
+
+        \subsubsection{Extrinsic}
+        \begin{center}
+            \begin{tabular}{l c}
+                Parameter & Degrees of freedom \\
+                \hline  % chktex 44
+                Rotation & 3 \\
+                Translation & 3
+            \end{tabular}
+        \end{center}
+
+    \subsection{Vanishing points}
+    \begin{itemize}
+        \item Sets of 3D parallel lines intersect at a vanishing point
+        \item Horizon is a collection of all the vanishing points corresponding to \textbf{a set of parallel planes}
+    \end{itemize}
+
+    \subsection{Camera calibration}
+    \begin{itemize}
+        \item Estimating the projection matrix from a known calibration object
+        \item Proper calibration reqpires measuring the points at a sub-pixel accuracy
+        \item Highly depends on the calibration pattern
+        \item A rule of thumb:
+        \begin{itemize}
+            \item Number of constraints should exceed the number of unknowns by a factor of 5
+            \item e.g.\ for \textbf{11 parameters} in $P$, use \textbf{at least 28 points} (2 equations per point pair)
+        \end{itemize}
+    \end{itemize}
+
+    \newpage
+
 
 \end{document}

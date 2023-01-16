@@ -498,5 +498,49 @@ Two kinds of projections
 
     \newpage
 
+\section{Multiple-view geometry}
 
+    \subsection{Stereo geometry and scene reconstruction}
+
+        \subsubsection{Epipolar geometry}
+        \begin{itemize}
+            \item \textbf{Baseline:} a line connecting the camera centers
+            \item \textbf{Epipole:} a point where the baseline punctures the image plane
+            \item \textbf{Epipolar plane:} a plane connecting two epipoles and a 3D point
+            \item \textbf{Epipolar line:} an intersection of the epipolar plane and an image plane
+        \end{itemize}
+
+        \subsubsection{Essential matrix}
+        \begin{itemize}
+            \item Denoted by $\mathbf{E}$
+            \item A 3D point is mapped to points $\mathbf{p}$ and $\mathbf{p'}$ which are related by $\mathbf{p^T E p' = 0}$ 
+        \end{itemize}
+
+    \subsection{Structure from motion (SFM)}
+    
+        \subsubsection{Fundamental matrix}
+        \begin{itemize}
+            \item Denoted by $\mathbf{F}$
+            \item $F = K^{-T} E K'^{-1}$
+        \end{itemize}
+
+        \subsubsection{Fundamental matrix estimation}
+        \begin{enumerate}
+            \item Find keypoints in each image
+            \item Calculate possible matches
+            \item Robustly estimate the epipolar geometry by RANSAC
+        \end{enumerate}
+    
+        \subsubsection{Normalized 8-point algorithm}
+        \begin{enumerate}
+            \item Precondition: center image points and scale such that the standard deviation becomes $\sqrt{2}$ pixels
+            \item Apply 8-point algorithm to calculate $\mathbf{\tilde{F}}$ from the preconditioned points
+            \item Enforce $\mathbf{\textbf{rank}=2}$
+            \item Transform the fundamental matrix back to original units
+        \end{enumerate}
+
+    \subsection{Active stereo}
+    \begin{itemize}
+        \item Uses \textbf{one camera} and a \textbf{projector} (e.g.\ a laser pointer)
+    \end{itemize}
 \end{document}

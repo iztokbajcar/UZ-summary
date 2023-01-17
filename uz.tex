@@ -543,4 +543,122 @@ Two kinds of projections
     \begin{itemize}
         \item Uses \textbf{one camera} and a \textbf{projector} (e.g.\ a laser pointer)
     \end{itemize}
+
+    \newpage
+
+\section{Recognition}
+How to come up with features?
+\begin{enumerate}
+    \item Natural (linear) coordinate systems:
+    \begin{itemize}
+        \item For some applications it is enough just to linearly transform the input data
+        \item \textbf{PCA}/\textbf{LDA}
+    \end{itemize}
+    \item Handcrafted nonlinear transforms:
+    \begin{itemize}
+        \item Nonlinear transforms improve feature robustness
+        \item \textbf{HoG}
+    \end{itemize}
+    \item Feature selection:
+    \begin{itemize}
+        \item Machine learning to select optimal features from a pool of several handcrafted transforms
+        \item \textbf{AdaBoost}
+    \end{itemize}
+    \item End-to-end learning of feature transform:
+    \begin{itemize}
+        \item Have a machine learn the entire feature extraction and selection pipeline
+    \end{itemize}
+\end{enumerate}
+
+    \subsection{Learning natural coordinate systems by subspace methods}
+    An image of a face can be treated as a high-dimensional gray-level vector (100$\times$100 = 10,000$\times$1 vector) 
+    
+    \subsection{Reconstruction subspace: Principal component analysis (PCA)}
+    $\mathbf{M}$ --- the number of pixels in the image \\
+    $\mathbf{N}$ --- the number of training examples (typically much lower than $M$) 
+        
+    \begin{enumerate}
+        \item Estimate the mean vector: $\mathbf{\mu} = \frac{1}{N} \sum_{i=1}^N \mathbf{x}_i$ 
+        \item Center the input data around the mean: $\mathbf{\hat{X}}_i = \mathbf{X}_i - \mu$
+        \item if $M \leq N$ then:
+        \begin{enumerate}
+            \item Estimate the covariance matrix: $\mathbf{C} = \frac{1}{N} \mathbf{\hat{X}\hat{X}^T}$
+            \item Perform SVD on $\mathbf{C}$. Obtain eigenvectors $\mathbf{U}$ and eigenvalues $\mathbf{\lambda}$.
+        \end{enumerate}
+        \item else:
+        \begin{enumerate}
+            \item Estimate the inner product matrix: $\mathbf{C'} = \frac{1}{N} \mathbf{\hat{X}\hat{X}^T}$
+            \item Perform SVD on $\mathbf{C'}$. Obtain eigenvectors $\mathbf{U'}$ and eigenvalues $\mathbf{\lambda'}$.
+            \item Determine the eigenvectors $\mathbf{U}$: $\mathbf{u}_i = \frac{\mathbf{\hat{X}u'_i}}{\sqrt{N\lambda'_i}}, i = 1 \ldots N$
+            \item Determine the eigenvalues $\mathbf{\lambda} = \mathbf{\lambda'}$
+        \end{enumerate}
+        \item end if
+    \end{enumerate}
+
+    \begin{itemize}
+        \item Even in PCA, the same object, viewed under different conditions (illumination, orientation) projects into different parts of the subspace. This means that we could generate different appearances by accessing specific parts of the subspace.
+        \item Linear encoders (PCA) are quite weak for storing  various kinds of appearances --- \textbf{Neural-network encoders are more powerful}!
+    \end{itemize}
+
+    \subsection{Discrimination subspace: linear discriminant analysis (LDA)}
+    Find a subspace that:
+    \begin{itemize}
+        \item \textbf{Maximizes} distances between classes
+        \item \textbf{Minimizes} distances within classes
+    \end{itemize}
+
+    \subsection{Handcrafted non-linear transforms}
+        \subsubsection{HoG}
+        \begin{itemize}
+            \item Histogram of gradients
+        \end{itemize}
+
+    \subsection{Learning features by feature selection}
+    To apply in real-time applications:
+    \begin{enumerate}
+        \item Feature extraction should be fast
+        \item Classifier application should be fast
+    \end{enumerate}
+
+        \subsubsection{AdaBoost}
+        \begin{itemize}
+            \item Builds a strong classifier which is a weighted sum of many weak classifiers
+            \item Simple to implement
+        \end{itemize}
+
+        \begin{enumerate}
+            \item Train a sequence of weak classifiers.
+            \item Each weak classifier splits training examples with at least 50\% accuracy
+            \item incorrectly classified examples get more weight in training the next weak classifier
+        \end{enumerate}
+
+        \subsubsection{Cascade of classifiers}
+        When going over the image with a sliding window, we can save time by applying only a first few classifiers to reject the windows that very likely do not contain the particular category. The ``surviving'' regions are then re-classified with stronger classifiers.
+    
+        \subsection{End-to-end feature (and classifier) learning}
+            \subsubsection{Convolutional neural networks (CNN)}
+
+            \begin{itemize}
+                \item Convolutional layers
+                \item Non-linearity (RELU)
+                \item Pooling layers
+            \end{itemize}
+
+            \textbf{Convolutional layers} --- they convolve the input and pass the result to the next layer
+            
+            \begin{itemize}
+                \item Input: e.g.\ an 32$\times$32$\times$3 image, $N$ filters
+                \item Output: a 32$\times$32$\times N$ tensor
+            \end{itemize}
+
+            \textbf{Nonlinear layers} --- e.g.\ Rectified linear unit (RELU), implement nonlinear feature transformations (e.g.\ setting negative values to 0)
+
+            \begin{itemize}
+                \item Input: $N$ inputs
+                \item Output: $N$ outputs
+            \end{itemize}
+
+            \textbf{Pooling layers} --- aim to increase the receptive field without significantly increasing the number of parameters
+
+
 \end{document}

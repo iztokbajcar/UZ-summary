@@ -132,6 +132,7 @@ Processing steps:
         \begin{itemize}
             \item Noise reduction and image restoration
             \item Structure extraction/enhancement
+            \item Filters are \textbf{separable} if they can be written as a product of two more simple filters
         \end{itemize}
 
             \subsubsection{Types of noise}
@@ -587,7 +588,7 @@ How to come up with features?
         \end{enumerate}
         \item else:
         \begin{enumerate}
-            \item Estimate the inner product matrix: $\mathbf{C'} = \frac{1}{N} \mathbf{\hat{X}\hat{X}^T}$
+            \item Estimate the inner product matrix: $\mathbf{C'} = \frac{1}{N} \mathbf{\hat{X}^T \hat{X}}$
             \item Perform SVD on $\mathbf{C'}$. Obtain eigenvectors $\mathbf{U'}$ and eigenvalues $\mathbf{\lambda'}$.
             \item Determine the eigenvectors $\mathbf{U}$: $\mathbf{u}_i = \frac{\mathbf{\hat{X}u'_i}}{\sqrt{N\lambda'_i}}, i = 1 \ldots N$
             \item Determine the eigenvalues $\mathbf{\lambda} = \mathbf{\lambda'}$
